@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from app.api.v1.router import api_router
+from app.api.websocket.handlers import router as ws_router
 from app.core.middleware import setup_cors
 
 
@@ -18,6 +19,7 @@ def create_app() -> FastAPI:
 
     setup_cors(application)
     application.include_router(api_router)
+    application.include_router(ws_router)
 
     @application.get("/health")
     async def health_check() -> dict:

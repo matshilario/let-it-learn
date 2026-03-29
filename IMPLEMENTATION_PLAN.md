@@ -16,7 +16,7 @@ Construir do zero um SaaS multi-tenant chamado **Let It Learn** voltado para pro
 |------|--------|--------|
 | Fase 1: Fundacao | CONCLUIDA | `86c6ab1` |
 | Fase 2: Criador de Atividades | CONCLUIDA | `374a3fd` |
-| Fase 3: Player do Aluno | PENDENTE | - |
+| Fase 3: Player do Aluno | CONCLUIDA | `0531b60` |
 | Fase 4: Sessoes ao Vivo | PENDENTE | - |
 | Fase 5: Analytics | PENDENTE | - |
 | Fase 6: Gamificacao | PENDENTE | - |
@@ -346,16 +346,16 @@ Railway Project: "let-it-learn"
 - [x] Frontend: Hooks use-activities, use-questions
 - [x] Frontend: 3 novos componentes shadcn (switch, textarea, breadcrumb)
 
-### Fase 3: Player do Aluno - PROXIMO
-- [ ] Frontend: Pagina de entrada do aluno (short_code ou join_code)
-- [ ] Frontend: Tela de identificacao (nickname para open, login para authenticated)
-- [ ] Frontend: Player shell (navegacao entre questoes, progress bar)
-- [ ] Frontend: 7 renderers interativos (um por tipo de questao)
-- [ ] Frontend: Timer/countdown display
-- [ ] Frontend: Pagina de resultados (score, acertos/erros, explicacoes)
-- [ ] Frontend: Zustand store para player state
-- [ ] Frontend: Hook use-player + API play endpoints
-- [ ] Backend: Validacoes adicionais no play (tentativas, timer expirado)
+### Fase 3: Player do Aluno - CONCLUIDA
+- [x] Frontend: Pagina de entrada do aluno (short_code, nickname input, activity info)
+- [x] Frontend: Layout minimalista para play (sem sidebar)
+- [x] Frontend: Player shell (navegacao entre questoes, progress dots, timer)
+- [x] Frontend: 7 renderers interativos (MC, V/F, matching, texto, fill-blank, ordering, categorization)
+- [x] Frontend: Timer/countdown com auto-submit ao expirar
+- [x] Frontend: Pagina de resultados (score circular, breakdown por questao, confetti 80%+)
+- [x] Frontend: Zustand store para player state
+- [x] Frontend: Play API client (6 endpoints) + use-timer hook
+- [x] Frontend: Dialogo de confirmacao antes de finalizar
 
 ### Fase 4: Sessoes ao Vivo e Real-Time
 - [ ] Backend: WebSocket manager (FastAPI WebSocket + Redis pub/sub)

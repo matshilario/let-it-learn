@@ -186,7 +186,7 @@ export default function DashboardPage() {
                 Criar Atividade
                 <ArrowRight className="ml-auto h-4 w-4" />
             </Button>
-            <Button className="w-full justify-start" variant="outline" render={<Link href="/dashboard/sessions" />}>
+            <Button className="w-full justify-start" variant="outline" render={<Link href="/sessions" />}>
                 <Radio className="mr-2 h-4 w-4" />
                 Iniciar Sessao
                 <ArrowRight className="ml-auto h-4 w-4" />

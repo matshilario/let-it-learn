@@ -40,7 +40,7 @@ const navItems = [
   },
   {
     title: "Sessoes",
-    href: "/dashboard/sessions",
+    href: "/sessions",
     icon: Radio,
   },
   {

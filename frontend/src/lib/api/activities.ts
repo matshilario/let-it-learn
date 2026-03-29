@@ -75,3 +75,10 @@ export async function getActivityByCode(code: string): Promise<Activity> {
   )
   return data
 }
+
+export async function getAllTeacherActivities(): Promise<Activity[]> {
+  const { data } = await apiClient.get<Activity[]>(
+    "/api/v1/activities/"
+  )
+  return data
+}
