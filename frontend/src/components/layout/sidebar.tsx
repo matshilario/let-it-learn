@@ -45,12 +45,12 @@ const navItems = [
   },
   {
     title: "Turmas",
-    href: "/dashboard/classes",
+    href: "/classes",
     icon: Users,
   },
   {
     title: "Analytics",
-    href: "/dashboard/analytics",
+    href: "/analytics",
     icon: BarChart3,
   },
   {

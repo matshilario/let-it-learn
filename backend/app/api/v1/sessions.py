@@ -5,13 +5,16 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_teacher
 from app.api.websocket.manager import manager
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.db.database import get_db
+from app.domain.export.csv_exporter import export_session_csv
 from app.models.question import Question
+from app.models.response import Response
 from app.models.session import Session
 from app.models.student_session import StudentSession
 from app.models.teacher import Teacher
@@ -136,6 +139,48 @@ async def get_session_results(
     )
     student_sessions = result.scalars().all()
     return [StudentSessionResponse.model_validate(ss) for ss in student_sessions]
+
+
+@router.get("/{session_id}/export/csv")
+async def export_session_csv_endpoint(
+    session_id: uuid.UUID,
+    teacher: Teacher = Depends(get_current_teacher),
+    db: AsyncSession = Depends(get_db),
+) -> StreamingResponse:
+    session = await _get_session(session_id, teacher, db)
+
+    ss_result = await db.execute(
+        select(StudentSession)
+        .where(StudentSession.session_id == session_id)
+        .order_by(StudentSession.score.desc())
+    )
+    student_sessions = ss_result.scalars().all()
+
+    questions_result = await db.execute(
+        select(Question)
+        .where(Question.activity_id == session.activity_id)
+        .order_by(Question.sort_order)
+    )
+    questions = questions_result.scalars().all()
+
+    ss_ids = [ss.id for ss in student_sessions]
+    responses_by_ss: dict[str, list[Response]] = {str(sid): [] for sid in ss_ids}
+    if ss_ids:
+        resp_result = await db.execute(
+            select(Response).where(Response.student_session_id.in_(ss_ids))
+        )
+        for r in resp_result.scalars().all():
+            responses_by_ss.setdefault(str(r.student_session_id), []).append(r)
+
+    csv_content = export_session_csv(student_sessions, questions, responses_by_ss)
+
+    return StreamingResponse(
+        iter([csv_content]),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename=session_{session_id}.csv"
+        },
+    )
 
 
 # ---------------------------------------------------------------------------
