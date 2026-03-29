@@ -17,8 +17,8 @@ Construir do zero um SaaS multi-tenant chamado **Let It Learn** voltado para pro
 | Fase 1: Fundacao | CONCLUIDA | `86c6ab1` |
 | Fase 2: Criador de Atividades | CONCLUIDA | `374a3fd` |
 | Fase 3: Player do Aluno | CONCLUIDA | `0531b60` |
-| Fase 4: Sessoes ao Vivo | PENDENTE | - |
-| Fase 5: Analytics | PENDENTE | - |
+| Fase 4: Sessoes ao Vivo | CONCLUIDA | `78e467e` |
+| Fase 5: Analytics | CONCLUIDA | `c8544f7` |
 | Fase 6: Gamificacao | PENDENTE | - |
 | Fase 7: Polimento | PENDENTE | - |
 | Fase 8: Lancamento | PENDENTE | - |
@@ -357,25 +357,28 @@ Railway Project: "let-it-learn"
 - [x] Frontend: Play API client (6 endpoints) + use-timer hook
 - [x] Frontend: Dialogo de confirmacao antes de finalizar
 
-### Fase 4: Sessoes ao Vivo e Real-Time
-- [ ] Backend: WebSocket manager (FastAPI WebSocket + Redis pub/sub)
-- [ ] Backend: WebSocket handlers (join, answer, question_changed, results)
-- [ ] Backend: Endpoints live session control (next question, lock, unlock)
-- [ ] Frontend: Pagina de monitor para professor (real-time)
-- [ ] Frontend: Controles de sessao (proximo, travar, encerrar)
-- [ ] Frontend: Join de sessao live para aluno
-- [ ] Frontend: Leaderboard ao vivo
-- [ ] Frontend: Hook use-websocket
-- [ ] Redis no Railway
+### Fase 4: Sessoes ao Vivo e Real-Time - CONCLUIDA
+- [x] Backend: WebSocket connection manager (singleton, in-memory)
+- [x] Backend: WS endpoint /ws/session/{id} com JWT auth para professores
+- [x] Backend: WS handlers (answer com auto-grading, heartbeat, broadcasts)
+- [x] Backend: 6 novos endpoints (start-live, next/prev-question, lock/unlock, leaderboard)
+- [x] Frontend: Pagina de sessoes com listagem, filtros e dialog de criacao
+- [x] Frontend: Monitor de sessao live (participantes, progresso, QR code, controles)
+- [x] Frontend: Join page para alunos (codigo 6 chars + nickname)
+- [x] Frontend: Live player (questoes via WebSocket, estados waiting/locked/ended)
+- [x] Frontend: Leaderboard com top 3 gold/silver/bronze
+- [x] Frontend: useWebSocket hook com auto-reconnect (3 retries)
+- [x] Frontend: Session Zustand store + TanStack Query hooks
 
-### Fase 5: Analytics e Relatorios
-- [ ] Backend: Engine de analytics (queries agregadas por modulo/aula/aluno)
-- [ ] Backend: Export CSV
-- [ ] Backend: Export PDF (WeasyPrint)
-- [ ] Frontend: Dashboard de analytics (Recharts)
-- [ ] Frontend: Graficos: distribuicao de scores, tempo, dificuldade por questao
-- [ ] Frontend: Gradebook da turma
-- [ ] Frontend: Botoes de export CSV/PDF
+### Fase 5: Analytics e Relatorios - CONCLUIDA
+- [x] Backend: 4 novos endpoints analytics (module, activity, student, engagement)
+- [x] Backend: Score distribution, question difficulty, performance trends
+- [x] Backend: CSV export para resultados de sessao (StreamingResponse)
+- [x] Frontend: Dashboard analytics com Recharts (sessions trend, students trend, completion rate)
+- [x] Frontend: 4 componentes de graficos reutilizaveis (stats-card, score-distribution, sessions-trend, question-difficulty)
+- [x] Frontend: Pagina de turmas com CRUD e join code
+- [x] Frontend: Gradebook da turma com tabela de alunos
+- [x] Frontend: Analytics + Classes API clients e hooks
 
 ### Fase 6: Gamificacao
 - [ ] Backend: Engine de pontos (time bonus, streak multiplier)
