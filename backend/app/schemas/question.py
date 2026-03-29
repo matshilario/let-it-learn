@@ -29,7 +29,27 @@ class QuestionOptionResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "populate_by_name": True}
+
+    @classmethod
+    def model_validate(cls, obj: object, **kwargs: object) -> "QuestionOptionResponse":
+        if hasattr(obj, "extra_metadata"):
+            # Map the Python attribute name to schema field
+            data = {
+                "id": obj.id,
+                "question_id": obj.question_id,
+                "content": obj.content,
+                "media_url": obj.media_url,
+                "is_correct": obj.is_correct,
+                "sort_order": obj.sort_order,
+                "category_id": obj.category_id,
+                "match_target_id": obj.match_target_id,
+                "metadata": obj.extra_metadata,
+                "created_at": obj.created_at,
+                "updated_at": obj.updated_at,
+            }
+            return cls(**data)
+        return super().model_validate(obj, **kwargs)
 
 
 class QuestionCreate(BaseModel):

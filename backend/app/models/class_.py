@@ -36,9 +36,9 @@ class Class(Base):
     join_code: Mapped[str] = mapped_column(String(16), unique=True, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
 
-    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="classes", lazy="selectin")
-    institution: Mapped[Institution | None] = relationship("Institution", back_populates="classes", lazy="selectin")
+    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="classes")
+    institution: Mapped[Institution | None] = relationship("Institution", back_populates="classes")
     students: Mapped[list[Student]] = relationship(
         "Student", secondary=class_students, lazy="selectin"
     )
-    sessions: Mapped[list[Session]] = relationship("Session", back_populates="class_", lazy="selectin")
+    sessions: Mapped[list[Session]] = relationship("Session", back_populates="class_")

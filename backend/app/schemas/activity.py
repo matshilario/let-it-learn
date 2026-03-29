@@ -10,7 +10,7 @@ class ActivityCreate(BaseModel):
     title: str
     description: str | None = None
     activity_type: str
-    access_mode: str = "public"
+    access_mode: str = "open"
     is_published: bool = False
     sort_order: int = 0
     time_limit_seconds: int | None = None

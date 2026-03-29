@@ -81,6 +81,19 @@ async def _get_activity(activity_id: uuid.UUID, teacher: Teacher, db: AsyncSessi
     return activity
 
 
+@router.get("/activities/by-code/{code}", response_model=ActivityResponse)
+async def get_activity_by_code(
+    code: str,
+    teacher: Teacher | None = Depends(get_current_user_optional),
+    db: AsyncSession = Depends(get_db),
+) -> ActivityResponse:
+    result = await db.execute(select(Activity).where(Activity.short_code == code))
+    activity = result.scalar_one_or_none()
+    if not activity:
+        raise NotFoundException("Activity not found")
+    return ActivityResponse.model_validate(activity)
+
+
 @router.get("/activities/{activity_id}", response_model=ActivityResponse)
 async def get_activity(
     activity_id: uuid.UUID,
@@ -135,16 +148,3 @@ async def get_activity_qrcode(
     img.save(buf, format="PNG")
     buf.seek(0)
     return StreamingResponse(buf, media_type="image/png")
-
-
-@router.get("/activities/by-code/{code}", response_model=ActivityResponse)
-async def get_activity_by_code(
-    code: str,
-    teacher: Teacher | None = Depends(get_current_user_optional),
-    db: AsyncSession = Depends(get_db),
-) -> ActivityResponse:
-    result = await db.execute(select(Activity).where(Activity.short_code == code))
-    activity = result.scalar_one_or_none()
-    if not activity:
-        raise NotFoundException("Activity not found")
-    return ActivityResponse.model_validate(activity)

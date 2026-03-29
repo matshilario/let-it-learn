@@ -28,7 +28,7 @@ class Activity(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     activity_type: Mapped[str] = mapped_column(String(32), nullable=False)
-    access_mode: Mapped[str] = mapped_column(String(32), nullable=False, default="public")
+    access_mode: Mapped[str] = mapped_column(String(32), nullable=False, default="open")
     short_code: Mapped[str] = mapped_column(String(16), unique=True, nullable=False)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_published: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
@@ -42,9 +42,9 @@ class Activity(Base):
     passing_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     gamification: Mapped[dict | None] = mapped_column(JSONB, nullable=True, default=dict)
 
-    lesson: Mapped[Lesson] = relationship("Lesson", back_populates="activities", lazy="selectin")
-    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="activities", lazy="selectin")
+    lesson: Mapped[Lesson] = relationship("Lesson", back_populates="activities")
+    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="activities")
     questions: Mapped[list[Question]] = relationship(
         "Question", back_populates="activity", lazy="selectin", cascade="all, delete-orphan"
     )
-    sessions: Mapped[list[Session]] = relationship("Session", back_populates="activity", lazy="selectin")
+    sessions: Mapped[list[Session]] = relationship("Session", back_populates="activity")

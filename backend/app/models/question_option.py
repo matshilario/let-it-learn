@@ -25,6 +25,6 @@ class QuestionOption(Base):
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     category_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     match_target_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    metadata_: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True, default=dict)
+    extra_metadata: Mapped[dict | None] = mapped_column("metadata", JSONB, nullable=True, default=dict)
 
-    question: Mapped[Question] = relationship("Question", back_populates="options", lazy="selectin")
+    question: Mapped[Question] = relationship("Question", back_populates="options")

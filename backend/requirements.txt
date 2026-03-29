@@ -4,8 +4,9 @@ sqlalchemy[asyncio]
 asyncpg
 alembic
 pydantic-settings
+pydantic[email]
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt
 python-multipart
 redis
 qrcode

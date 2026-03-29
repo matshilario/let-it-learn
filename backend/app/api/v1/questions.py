@@ -68,7 +68,7 @@ async def create_question(
                 sort_order=opt_data.sort_order,
                 category_id=opt_data.category_id,
                 match_target_id=opt_data.match_target_id,
-                metadata_=opt_data.metadata,
+                extra_metadata=opt_data.metadata,
             )
             db.add(option)
         await db.flush()
@@ -113,7 +113,7 @@ async def update_question(
                 sort_order=opt_data.sort_order,
                 category_id=opt_data.category_id,
                 match_target_id=opt_data.match_target_id,
-                metadata_=opt_data.metadata,
+                extra_metadata=opt_data.metadata,
             )
             db.add(option)
 

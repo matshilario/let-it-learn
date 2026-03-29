@@ -27,7 +27,7 @@ class Module(Base):
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     settings: Mapped[dict | None] = mapped_column(JSONB, nullable=True, default=dict)
 
-    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="modules", lazy="selectin")
+    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="modules")
     lessons: Mapped[list[Lesson]] = relationship(
-        "Lesson", back_populates="module", lazy="selectin", cascade="all, delete-orphan"
+        "Lesson", back_populates="module", cascade="all, delete-orphan"
     )

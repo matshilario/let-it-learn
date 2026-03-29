@@ -24,5 +24,5 @@ class Student(Base):
     level: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
 
     student_sessions: Mapped[list[StudentSession]] = relationship(
-        "StudentSession", back_populates="student", lazy="selectin"
+        "StudentSession", back_populates="student"
     )

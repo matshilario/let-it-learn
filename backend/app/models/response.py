@@ -30,5 +30,5 @@ class Response(Base):
     time_spent_seconds: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     answered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
-    student_session: Mapped[StudentSession] = relationship("StudentSession", back_populates="responses", lazy="selectin")
-    question: Mapped[Question] = relationship("Question", back_populates="responses", lazy="selectin")
+    student_session: Mapped[StudentSession] = relationship("StudentSession", back_populates="responses")
+    question: Mapped[Question] = relationship("Question", back_populates="responses")

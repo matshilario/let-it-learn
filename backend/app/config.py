@@ -10,7 +10,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/let_it_learn"
+    DATABASE_URL: str = "postgresql+asyncpg://letitlearn:letitlearn@localhost:5432/letitlearn"
     REDIS_URL: str = "redis://localhost:6379/0"
     JWT_SECRET: str = "change-me-to-a-random-secret-key"
     JWT_ALGORITHM: str = "HS256"

@@ -29,8 +29,8 @@ class Lesson(Base):
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     is_published: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
-    module: Mapped[Module] = relationship("Module", back_populates="lessons", lazy="selectin")
-    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="lessons", lazy="selectin")
+    module: Mapped[Module] = relationship("Module", back_populates="lessons")
+    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="lessons")
     activities: Mapped[list[Activity]] = relationship(
-        "Activity", back_populates="lesson", lazy="selectin", cascade="all, delete-orphan"
+        "Activity", back_populates="lesson", cascade="all, delete-orphan"
     )

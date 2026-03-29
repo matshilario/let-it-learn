@@ -39,9 +39,9 @@ class Session(Base):
     )
     settings: Mapped[dict | None] = mapped_column(JSONB, nullable=True, default=dict)
 
-    activity: Mapped[Activity] = relationship("Activity", back_populates="sessions", lazy="selectin")
-    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="sessions", lazy="selectin")
-    class_: Mapped[Class | None] = relationship("Class", back_populates="sessions", lazy="selectin")
+    activity: Mapped[Activity] = relationship("Activity", back_populates="sessions")
+    teacher: Mapped[Teacher] = relationship("Teacher", back_populates="sessions")
+    class_: Mapped[Class | None] = relationship("Class", back_populates="sessions")
     student_sessions: Mapped[list[StudentSession]] = relationship(
-        "StudentSession", back_populates="session", lazy="selectin", cascade="all, delete-orphan"
+        "StudentSession", back_populates="session", cascade="all, delete-orphan"
     )

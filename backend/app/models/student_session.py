@@ -35,8 +35,8 @@ class StudentSession(Base):
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    session: Mapped[Session] = relationship("Session", back_populates="student_sessions", lazy="selectin")
-    student: Mapped[Student | None] = relationship("Student", back_populates="student_sessions", lazy="selectin")
+    session: Mapped[Session] = relationship("Session", back_populates="student_sessions")
+    student: Mapped[Student | None] = relationship("Student", back_populates="student_sessions")
     responses: Mapped[list[Response]] = relationship(
-        "Response", back_populates="student_session", lazy="selectin", cascade="all, delete-orphan"
+        "Response", back_populates="student_session", cascade="all, delete-orphan"
     )

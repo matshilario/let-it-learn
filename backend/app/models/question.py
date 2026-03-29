@@ -31,8 +31,8 @@ class Question(Base):
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     config: Mapped[dict | None] = mapped_column(JSONB, nullable=True, default=dict)
 
-    activity: Mapped[Activity] = relationship("Activity", back_populates="questions", lazy="selectin")
+    activity: Mapped[Activity] = relationship("Activity", back_populates="questions")
     options: Mapped[list[QuestionOption]] = relationship(
         "QuestionOption", back_populates="question", lazy="selectin", cascade="all, delete-orphan"
     )
-    responses: Mapped[list[Response]] = relationship("Response", back_populates="question", lazy="selectin")
+    responses: Mapped[list[Response]] = relationship("Response", back_populates="question")
