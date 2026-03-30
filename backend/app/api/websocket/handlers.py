@@ -10,9 +10,12 @@ from sqlalchemy import select
 from app.api.websocket.manager import manager
 from app.core.security import decode_token
 from app.db.database import async_session_factory
+from app.domain.gamification import calculate_score, calculate_xp_gain, level_from_xp
 from app.domain.grading import grade_response
+from app.models.activity import Activity
 from app.models.question import Question
 from app.models.response import Response
+from app.models.student import Student
 from app.models.student_session import StudentSession
 
 logger = logging.getLogger(__name__)
@@ -156,23 +159,70 @@ async def _handle_answer(
                 )
                 return
 
+            # Fetch activity for gamification config
+            activity_result = await db.execute(
+                select(Activity).where(Activity.id == question.activity_id)
+            )
+            activity = activity_result.scalar_one_or_none()
+            gamification = activity.gamification if activity else None
+
             # Grade
-            is_correct, points_earned = grade_response(question, answer)
+            is_correct, base_points = grade_response(question, answer)
+
+            # Calculate current streak
+            prev_responses = await db.execute(
+                select(Response.is_correct)
+                .where(Response.student_session_id == ss.id)
+                .order_by(Response.answered_at.desc())
+            )
+            current_streak = 0
+            for (prev_correct,) in prev_responses:
+                if prev_correct:
+                    current_streak += 1
+                else:
+                    break
+
+            # Apply gamification scoring
+            scoring = calculate_score(
+                base_points=base_points,
+                is_correct=is_correct,
+                time_spent_seconds=time_spent,
+                time_limit_seconds=question.time_limit_seconds or (activity.time_limit_seconds if activity else None),
+                current_streak=current_streak,
+                gamification=gamification,
+            )
+
+            # Calculate XP
+            xp_earned = calculate_xp_gain(
+                total_points=scoring.total_points,
+                session_completed=False,
+                gamification=gamification,
+            )
 
             response = Response(
                 student_session_id=ss.id,
                 question_id=question.id,
                 answer=answer,
                 is_correct=is_correct,
-                points_earned=points_earned,
+                points_earned=scoring.total_points,
                 time_spent_seconds=time_spent,
                 answered_at=datetime.now(timezone.utc),
             )
             db.add(response)
 
-            ss.score += points_earned
+            ss.score += scoring.total_points
             ss.max_score += question.points
             ss.time_spent_seconds += time_spent
+
+            # Update student XP if authenticated
+            if ss.student_id and xp_earned > 0:
+                student_result = await db.execute(
+                    select(Student).where(Student.id == ss.student_id)
+                )
+                student = student_result.scalar_one_or_none()
+                if student:
+                    student.total_xp += xp_earned
+                    student.level = level_from_xp(student.total_xp)
 
             await db.commit()
 
@@ -182,7 +232,11 @@ async def _handle_answer(
                     "type": "answer_ack",
                     "question_id": str(question.id),
                     "is_correct": is_correct,
-                    "points_earned": points_earned,
+                    "points_earned": scoring.total_points,
+                    "time_bonus": scoring.time_bonus,
+                    "streak_multiplier": scoring.streak_multiplier,
+                    "streak_count": scoring.streak_count,
+                    "xp_earned": xp_earned,
                 }
             )
 
@@ -195,6 +249,7 @@ async def _handle_answer(
                     "question_id": str(question.id),
                     "is_correct": is_correct,
                     "nickname": ss.nickname,
+                    "points_earned": scoring.total_points,
                 },
             )
 

@@ -184,3 +184,60 @@ export interface TokenResponse {
   refresh_token: string
   token_type: string
 }
+
+// Gamification types
+
+export interface GamificationConfig {
+  enabled: boolean
+  time_bonus: boolean
+  time_bonus_max: number
+  streak_multiplier: boolean
+  streak_multiplier_max: number
+  xp_per_point: number
+  xp_completion_bonus: number
+}
+
+export interface BadgeDefinition {
+  id: string
+  name: string
+  description: string | null
+  icon: string
+  color: string
+  criteria_type: string
+  criteria_value: number
+  xp_reward: number
+  is_global: boolean
+  sort_order: number
+  created_at: string
+}
+
+export interface StudentBadge {
+  id: string
+  badge: BadgeDefinition
+  earned_at: string
+  context: Record<string, unknown> | null
+}
+
+export interface StudentProfile {
+  id: string
+  email: string | null
+  full_name: string | null
+  nickname: string | null
+  avatar_url: string | null
+  total_xp: number
+  level: number
+  xp_for_current_level: number
+  xp_for_next_level: number
+  badges: StudentBadge[]
+  sessions_completed: number
+  total_score: number
+}
+
+export interface LeaderboardEntry {
+  student_id: string
+  nickname: string | null
+  full_name: string | null
+  total_xp: number
+  level: number
+  badge_count: number
+}

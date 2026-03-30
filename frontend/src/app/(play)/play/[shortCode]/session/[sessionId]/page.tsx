@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
 import { QuestionRenderer } from "@/components/activity-player/question-renderer"
+import { PointsPopup } from "@/components/activity-player/points-popup"
+import { StreakDisplay } from "@/components/activity-player/streak-display"
 import { usePlayerStore } from "@/lib/stores/player-store"
 import { useTimer } from "@/lib/hooks/use-timer"
 import {
@@ -30,6 +32,7 @@ import {
   submitAnswer,
   completeSession,
   getActivityByCode,
+  type AnswerResponse,
 } from "@/lib/api/play"
 import { cn } from "@/lib/utils"
 
@@ -63,6 +66,13 @@ export default function PlayerPage() {
   const [activityTitle, setActivityTitle] = useState("")
   const [timeLimit, setTimeLimit] = useState<number | null>(null)
   const questionStartTime = useRef(Date.now())
+
+  // Gamification state
+  const [streak, setStreak] = useState(0)
+  const [streakMultiplier, setStreakMultiplier] = useState(1.0)
+  const [totalPoints, setTotalPoints] = useState(0)
+  const [lastAnswer, setLastAnswer] = useState<AnswerResponse | null>(null)
+  const [showPointsPopup, setShowPointsPopup] = useState(false)
 
   const handleExpire = useCallback(async () => {
     try {
@@ -169,12 +179,19 @@ export default function PlayerPage() {
         const timeSpent = Math.floor(
           (Date.now() - questionStartTime.current) / 1000
         )
-        await submitAnswer(params.sessionId, studentSessionId, {
+        const result = await submitAnswer(params.sessionId, studentSessionId, {
           question_id: currentQuestion.id,
           answer: { value: currentAnswer },
           time_spent_seconds: timeSpent,
         })
         markSubmitted(currentQuestion.id)
+
+        // Update gamification state
+        setLastAnswer(result)
+        setTotalPoints((p) => p + result.points_earned)
+        setStreak(result.streak_count)
+        setStreakMultiplier(result.streak_multiplier)
+        setShowPointsPopup(true)
       } catch {
         // Silently fail - answer will be resubmitted
       } finally {
@@ -249,12 +266,33 @@ export default function PlayerPage() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Points popup overlay */}
+      {lastAnswer && (
+        <PointsPopup
+          pointsEarned={lastAnswer.points_earned}
+          timeBonus={lastAnswer.time_bonus}
+          streakMultiplier={lastAnswer.streak_multiplier}
+          streakCount={lastAnswer.streak_count}
+          xpEarned={lastAnswer.xp_earned}
+          isCorrect={lastAnswer.is_correct}
+          show={showPointsPopup}
+          onDone={() => setShowPointsPopup(false)}
+        />
+      )}
+
       {/* Top bar */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h1 className="truncate text-sm font-medium text-muted-foreground">
-            {activityTitle}
-          </h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="truncate text-sm font-medium text-muted-foreground">
+              {activityTitle}
+            </h1>
+            <StreakDisplay
+              streak={streak}
+              multiplier={streakMultiplier}
+              totalPoints={totalPoints}
+            />
+          </div>
           {timeLimit !== null && timeRemaining !== undefined && (
             <div
               className={cn(

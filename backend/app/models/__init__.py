@@ -11,6 +11,7 @@ from app.models.class_ import Class, class_students
 from app.models.session import Session
 from app.models.student_session import StudentSession
 from app.models.response import Response
+from app.models.badge import Badge, StudentBadge
 
 __all__ = [
     "Base",
@@ -27,4 +28,6 @@ __all__ = [
     "Session",
     "StudentSession",
     "Response",
+    "Badge",
+    "StudentBadge",
 ]

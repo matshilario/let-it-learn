@@ -56,6 +56,7 @@ export async function updateActivity(
     show_feedback: boolean
     show_correct_answer: boolean
     passing_score: number
+    gamification: Record<string, unknown>
   }>
 ): Promise<Activity> {
   const { data } = await apiClient.put<Activity>(

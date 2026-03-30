@@ -19,7 +19,7 @@ Construir do zero um SaaS multi-tenant chamado **Let It Learn** voltado para pro
 | Fase 3: Player do Aluno | CONCLUIDA | `0531b60` |
 | Fase 4: Sessoes ao Vivo | CONCLUIDA | `78e467e` |
 | Fase 5: Analytics | CONCLUIDA | `c8544f7` |
-| Fase 6: Gamificacao | PENDENTE | - |
+| Fase 6: Gamificacao | CONCLUIDA | - |
 | Fase 7: Polimento | PENDENTE | - |
 | Fase 8: Lancamento | PENDENTE | - |
 
@@ -126,7 +126,7 @@ Construir do zero um SaaS multi-tenant chamado **Let It Learn** voltado para pro
 
 ---
 
-## Schema do Banco de Dados (13 Tabelas)
+## Schema do Banco de Dados (15 Tabelas)
 
 ### `teachers` (ancora multi-tenant)
 id (UUID PK), institution_id (FK NULL), email (UNIQUE), password_hash, full_name, avatar_url, locale, timezone, plan (free/pro/enterprise), is_active, email_verified, oauth_provider, oauth_id, settings (JSONB), timestamps
@@ -231,7 +231,7 @@ let_it_learn/
 
 ---
 
-## API Endpoints (54 rotas)
+## API Endpoints (60 rotas)
 
 ### Auth (`/api/v1/auth`)
 - `POST /register` - Registro do professor
@@ -299,6 +299,14 @@ let_it_learn/
 ### Analytics (`/api/v1/analytics`)
 - `GET /dashboard` - Stats gerais do professor
 - `GET /sessions/{id}` - Analytics da sessao (com breakdown por questao)
+
+### Gamification (`/api/v1/gamification`)
+- `GET /badges` - Listar badges
+- `POST /badges` - Criar badge
+- `DELETE /badges/{id}` - Excluir badge
+- `POST /badges/seed-defaults` - Seed 10 badges padrao
+- `GET /students/{id}/profile` - Perfil do aluno (XP, level, badges, stats)
+- `GET /leaderboard` - Ranking global por XP
 
 ---
 
@@ -380,15 +388,17 @@ Railway Project: "let-it-learn"
 - [x] Frontend: Gradebook da turma com tabela de alunos
 - [x] Frontend: Analytics + Classes API clients e hooks
 
-### Fase 6: Gamificacao
-- [ ] Backend: Engine de pontos (time bonus, streak multiplier)
-- [ ] Backend: Sistema de badges (criteria evaluation)
-- [ ] Backend: XP + niveis para alunos
-- [ ] Frontend: Display de pontos durante gameplay
-- [ ] Frontend: Animacoes de badge
-- [ ] Frontend: Podio animado ao final
-- [ ] Frontend: Perfil do aluno com XP/level/badges
-- [ ] Frontend: Config de gamificacao por atividade
+### Fase 6: Gamificacao - CONCLUIDA
+- [x] Backend: Engine de pontos (time bonus, streak multiplier)
+- [x] Backend: Sistema de badges (criteria evaluation, 10 badges padrao)
+- [x] Backend: XP + niveis para alunos (tabela progressiva)
+- [x] Backend: Badge + StudentBadge models + migration
+- [x] Backend: Gamification API (CRUD badges, student profile, XP leaderboard)
+- [x] Backend: Integracao com play flow (REST + WebSocket)
+- [x] Frontend: Display de pontos durante gameplay (PointsPopup + StreakDisplay)
+- [x] Frontend: Podio animado ao final (AnimatedPodium)
+- [x] Frontend: Perfil do aluno com XP/level/badges (/profile/[studentId])
+- [x] Frontend: Config de gamificacao por atividade (painel no activity builder)
 
 ### Fase 7: Polimento e Funcionalidades Avancadas
 - [ ] i18n (pt-BR + en) com next-intl

@@ -30,6 +30,10 @@ export interface AnswerResponse {
   is_correct: boolean | null
   points_earned: number
   correct_answer?: Record<string, unknown>
+  time_bonus: number
+  streak_multiplier: number
+  streak_count: number
+  xp_earned: number
 }
 
 export interface ResultsResponse {

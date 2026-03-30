@@ -264,6 +264,15 @@ export default function ActivityBuilderPage() {
   const [localPassingScore, setLocalPassingScore] = useState(60)
   const [localIsPublished, setLocalIsPublished] = useState(false)
 
+  // Gamification settings
+  const [gamificationEnabled, setGamificationEnabled] = useState(false)
+  const [gamificationTimeBonus, setGamificationTimeBonus] = useState(true)
+  const [gamificationTimeBonusMax, setGamificationTimeBonusMax] = useState(50)
+  const [gamificationStreak, setGamificationStreak] = useState(true)
+  const [gamificationStreakMax, setGamificationStreakMax] = useState(3.0)
+  const [gamificationXpPerPoint, setGamificationXpPerPoint] = useState(1)
+  const [gamificationXpCompletion, setGamificationXpCompletion] = useState(50)
+
   // Sync fetched data to store
   useEffect(() => {
     if (fetchedQuestions) {
@@ -289,6 +298,18 @@ export default function ActivityBuilderPage() {
       setLocalMaxAttempts(activity.max_attempts || 1)
       setLocalPassingScore(activity.passing_score || 60)
       setLocalIsPublished(activity.is_published)
+
+      // Gamification
+      const g = activity.gamification as Record<string, unknown> | null
+      if (g) {
+        setGamificationEnabled(!!g.enabled)
+        setGamificationTimeBonus(g.time_bonus !== false)
+        setGamificationTimeBonusMax(Number(g.time_bonus_max) || 50)
+        setGamificationStreak(g.streak_multiplier !== false)
+        setGamificationStreakMax(Number(g.streak_multiplier_max) || 3.0)
+        setGamificationXpPerPoint(Number(g.xp_per_point) || 1)
+        setGamificationXpCompletion(Number(g.xp_completion_bonus) || 50)
+      }
     }
   }, [activity])
 
@@ -364,6 +385,15 @@ export default function ActivityBuilderPage() {
           max_attempts: localMaxAttempts,
           passing_score: localPassingScore,
           is_published: localIsPublished,
+          gamification: {
+            enabled: gamificationEnabled,
+            time_bonus: gamificationTimeBonus,
+            time_bonus_max: gamificationTimeBonusMax,
+            streak_multiplier: gamificationStreak,
+            streak_multiplier_max: gamificationStreakMax,
+            xp_per_point: gamificationXpPerPoint,
+            xp_completion_bonus: gamificationXpCompletion,
+          },
         },
       })
 
@@ -689,6 +719,105 @@ export default function ActivityBuilderPage() {
                   }
                 />
               </div>
+
+              <Separator />
+
+              {/* Gamification */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Label>Gamificacao</Label>
+                  <Badge variant="outline" className="text-[10px]">
+                    Pontos, streaks, XP
+                  </Badge>
+                </div>
+                <Switch
+                  checked={gamificationEnabled}
+                  onCheckedChange={setGamificationEnabled}
+                />
+              </div>
+              {gamificationEnabled && (
+                <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">Bonus por Tempo</Label>
+                    <Switch
+                      checked={gamificationTimeBonus}
+                      onCheckedChange={setGamificationTimeBonus}
+                    />
+                  </div>
+                  {gamificationTimeBonus && (
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">
+                        Bonus maximo (% dos pontos base)
+                      </Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={gamificationTimeBonusMax}
+                        onChange={(e) =>
+                          setGamificationTimeBonusMax(Number(e.target.value))
+                        }
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">Multiplicador de Sequencia</Label>
+                    <Switch
+                      checked={gamificationStreak}
+                      onCheckedChange={setGamificationStreak}
+                    />
+                  </div>
+                  {gamificationStreak && (
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">
+                        Multiplicador maximo
+                      </Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={10}
+                        step={0.25}
+                        value={gamificationStreakMax}
+                        onChange={(e) =>
+                          setGamificationStreakMax(Number(e.target.value))
+                        }
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                  )}
+
+                  <Separator />
+
+                  <div className="space-y-1">
+                    <Label className="text-xs">XP por ponto ganho</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={10}
+                      value={gamificationXpPerPoint}
+                      onChange={(e) =>
+                        setGamificationXpPerPoint(Number(e.target.value))
+                      }
+                      className="h-8 text-sm"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-xs">Bonus XP por completar</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={gamificationXpCompletion}
+                      onChange={(e) =>
+                        setGamificationXpCompletion(Number(e.target.value))
+                      }
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                </div>
+              )}
 
               <Separator />
 

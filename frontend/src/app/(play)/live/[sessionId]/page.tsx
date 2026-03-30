@@ -22,9 +22,12 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { QuestionRenderer } from "@/components/activity-player/question-renderer"
+import { PointsPopup } from "@/components/activity-player/points-popup"
+import { StreakDisplay } from "@/components/activity-player/streak-display"
+import { AnimatedPodium } from "@/components/session/animated-podium"
 import { Leaderboard, type LeaderboardPlayer } from "@/components/session/leaderboard"
 import { useWebSocket } from "@/lib/hooks/use-websocket"
-import { submitAnswer } from "@/lib/api/play"
+import { submitAnswer, type AnswerResponse } from "@/lib/api/play"
 import type { Question } from "@/lib/types"
 import { cn } from "@/lib/utils"
 
@@ -59,6 +62,12 @@ function LivePlayerContent() {
   })
 
   const questionStartTime = useRef(Date.now())
+
+  // Gamification state
+  const [streak, setStreak] = useState(0)
+  const [streakMultiplier, setStreakMultiplier] = useState(1.0)
+  const [lastAnswer, setLastAnswer] = useState<AnswerResponse | null>(null)
+  const [showPointsPopup, setShowPointsPopup] = useState(false)
 
   const handleWsMessage = useCallback(
     (msg: Record<string, unknown>) => {
@@ -179,12 +188,19 @@ function LivePlayerContent() {
       const timeSpent = Math.floor(
         (Date.now() - questionStartTime.current) / 1000
       )
-      await submitAnswer(params.sessionId, studentSessionId, {
+      const result = await submitAnswer(params.sessionId, studentSessionId, {
         question_id: currentQuestion.id,
         answer: { value: answer },
         time_spent_seconds: timeSpent,
       })
       setSubmitted(true)
+
+      // Update gamification state
+      setLastAnswer(result)
+      setStreak(result.streak_count)
+      setStreakMultiplier(result.streak_multiplier)
+      setMyScore((prev) => prev + result.points_earned)
+      setShowPointsPopup(true)
     } catch {
       // Silently fail
     } finally {
@@ -194,6 +210,20 @@ function LivePlayerContent() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Points popup overlay */}
+      {lastAnswer && (
+        <PointsPopup
+          pointsEarned={lastAnswer.points_earned}
+          timeBonus={lastAnswer.time_bonus}
+          streakMultiplier={lastAnswer.streak_multiplier}
+          streakCount={lastAnswer.streak_count}
+          xpEarned={lastAnswer.xp_earned}
+          isCorrect={lastAnswer.is_correct}
+          show={showPointsPopup}
+          onDone={() => setShowPointsPopup(false)}
+        />
+      )}
+
       {/* Status bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -206,6 +236,11 @@ function LivePlayerContent() {
               #{myRank}
             </Badge>
           )}
+          <StreakDisplay
+            streak={streak}
+            multiplier={streakMultiplier}
+            totalPoints={0}
+          />
         </div>
         <div className="flex items-center gap-1.5 text-xs">
           {isConnected ? (
@@ -335,6 +370,21 @@ function LivePlayerContent() {
 
       {liveState === "ended" && (
         <div className="space-y-4 mt-4">
+          {/* Animated podium for top 3 */}
+          {leaderboard.length >= 2 && (
+            <Card>
+              <CardContent className="py-8">
+                <AnimatedPodium
+                  players={leaderboard.map((p) => ({
+                    id: p.id,
+                    nickname: p.nickname,
+                    score: p.score,
+                  }))}
+                />
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardContent className="flex flex-col items-center gap-4 py-12 text-center">
               <Trophy className="h-12 w-12 text-amber-500" />

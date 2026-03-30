@@ -8,6 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
 
 if TYPE_CHECKING:
+    from app.models.badge import StudentBadge
     from app.models.student_session import StudentSession
 
 
@@ -25,4 +26,7 @@ class Student(Base):
 
     student_sessions: Mapped[list[StudentSession]] = relationship(
         "StudentSession", back_populates="student"
+    )
+    student_badges: Mapped[list[StudentBadge]] = relationship(
+        "StudentBadge", back_populates="student", cascade="all, delete-orphan"
     )
